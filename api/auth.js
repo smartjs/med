@@ -20,9 +20,6 @@ router.post('/login', async (ctx, next) => {
         console.error(e)
     }
 
-    debug("DONE")
-
-
     if (user){
         ctx.status = 200;
         return ctx.body = "the token";
