@@ -6,13 +6,13 @@ const config = require('./config');
 
 app.use(mount('/auth', auth));
 
-app.use(async (ctx, next) => {
+/*app.use(async (ctx, next) => {
   console.log("CTX.PATH", ctx.path)
   return next();
 });
 
 
-/*debug.then(() => {
+debug.then(() => {
   console.log('done');
 }, (e) => {console.log(e);});*/
 
