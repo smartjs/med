@@ -1,13 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
+const configs = require('../configindex.js');
 
-const client = new Sequelize('med', 'root', '', {
-  dialect: 'mariadb',
-  host: 'localhost',
-  port: 3306,
-  logging: console.log, // eslint-disable-line no-console
-});
+const client =  new Sequelize(configs.DB_URL);
 
 const models = {};
 fs.readdirSync(__dirname + '/models')
