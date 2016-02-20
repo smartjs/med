@@ -2,13 +2,13 @@ const debug = require('./debug');
 const Koa = require('koa');
 const mount = require('./mount');
 const auth = require('./api/auth.js');
-const configs = require('./configindex.js');
-
+const configs = require('./config');
 
 debug.then(() => {
   console.log('done');
 }, (e) => {
-  console.log(e);});
+  console.log(e);
+});
 
 const app = new Koa();
 app.use(mount('/auth', auth));

@@ -7,19 +7,18 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const app = new Koa();
 
-
 app.use(async (ctx, next) => {
   var body = await cobody.form(ctx);
-  if(body){
+  if (body) {
     var receivedLogin = body.login;
     var receivedPassword = body.password;
-    if(receivedLogin && receivedPassword){
+    if (receivedLogin && receivedPassword) {
       //looking for user
       var result = await co(function* () {
-         return yield db.User.findOne({where:{login : receivedLogin}});
+        return yield db.User.findOne({where: {login: receivedLogin}});
       });
 
-      if(result && bcrypt.compareSync(receivedPassword, result.password)){
+      if (result && bcrypt.compareSync(receivedPassword, result.password)) {
         var user = {
           id: result.id,
           time: (new Date()).ms
@@ -27,7 +26,7 @@ app.use(async (ctx, next) => {
         var tokenresult = jwt.sign(user, process.env.Secret, {
           expiresInMinutes: 1440, // expires in 24 hours
         });
-        var answer = {token : tokenresult};
+        var answer = {token: tokenresult};
         ctx.body = answer;
       }
     }

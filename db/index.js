@@ -1,9 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
-const configs = require('../configindex.js');
+const config = require('../config');
 
-const client =  new Sequelize(configs.DB_URL);
+const client = new Sequelize(config.db);
 
 const models = {};
 fs.readdirSync(__dirname + '/models')
