@@ -26,10 +26,14 @@ app.use(async (ctx, next) => {
         var tokenresult = jwt.sign(user, process.env.Secret, {
           expiresInMinutes: 1440, // expires in 24 hours
         });
-        var answer = {token: tokenresult};
-        ctx.body = answer;
+
+        ctx.body = {token: tokenresult};
       }
+      ctx.status = 400;
+      ctx.body = {error: 'Wrong credentials'};
     }
+    ctx.status = 400;
+    ctx.body = {error: 'No credentials'};
   }
   next();
 });

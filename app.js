@@ -2,7 +2,6 @@ const debug = require('./debug');
 const Koa = require('koa');
 const mount = require('./mount');
 const auth = require('./api/auth.js');
-const configs = require('./config');
 
 debug.then(() => {
   console.log('done');
@@ -13,4 +12,4 @@ debug.then(() => {
 const app = new Koa();
 app.use(mount('/auth', auth));
 
-app.listen(configs.PORT);
+module.exports = app;

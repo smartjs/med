@@ -1,5 +1,6 @@
 var conf = {
   host: process.env.HOST || 'localhost',
+  serverPort: process.env.PORT || '3000',
   port: process.env.PORT || '3306',
   dialect: 'mariadb',
   user: process.env.USER,
