@@ -5,14 +5,16 @@ const co = require('co');
 const bcrypt = require('bcrypt-nodejs');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
+const koaRoute = require('koa-route');
 const app = new Koa();
 
 
-app.use(async (ctx, next) => {
+app.use(koaRoute.post('/', async (ctx, next) => {
   var body = await cobody.form(ctx);
   if(body){
     var receivedLogin = body.login;
     var receivedPassword = body.password;
+    console.log("receive something " +receivedLogin + " receivedLogin " + receivedPassword);
     if(receivedLogin && receivedPassword){
       //looking for user
       var result = await co(function* () {
@@ -33,6 +35,6 @@ app.use(async (ctx, next) => {
     }
   }
   next();
-});
+}));
 
 module.exports = app;
