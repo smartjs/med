@@ -3,5 +3,8 @@
     "ecmaFeatures": {
       "generators": true,
       "objectLiteralShorthandMethods": true
+    },
+    "env": {
+      "mocha": true
     }
 }
