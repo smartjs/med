@@ -1,2 +1,5 @@
 require('babel-register');
-require('./app');
+const config = require('./config');
+const app = require('./app');
+
+app.listen(config.port);

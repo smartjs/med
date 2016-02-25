@@ -1,20 +1,25 @@
 const app = new (require('koa'))();
 const debug = require('./debug');
 const mount = require('./mount');
-const auth = require('./api/auth');
-const config = require('./config');
+const router = require('koa-router')();
+const authHandler = require('./api/auth');
+const tokenGenerator = require('./api/token');
 
-app.use(mount('/auth', auth));
+(async () => {
 
-/*app.use(async (ctx, next) => {
-  console.log("CTX.PATH", ctx.path)
-  return next();
-});
+    if (process.env.TEST){
+        await debug;
+    }
 
+    router.head('/', async (ctx, next) => {
+        ctx.status = 200;
+        return next();
+    });
 
-debug.then(() => {
-  console.log('done');
-}, (e) => {console.log(e);});*/
+    app.use(router.routes());
+    app.use(mount('/auth', authHandler));
+    app.use(tokenGenerator);
 
-app.listen(config.port);
+})();
+
 module.exports = app;
