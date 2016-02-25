@@ -55,10 +55,11 @@ function mount(prefix, app) {
         ctx.path = newPath;
         debug('enter %s -> %s', prev, ctx.path);
 
-        await downstream(ctx);
-        ctx.path = prev;
-        debug('leave %s -> %s', prev, ctx.path);
-        return upstream();
+        await downstream(ctx, async () => {
+            ctx.path = prev;
+            debug('leave %s -> %s', prev, ctx.path);
+            return upstream();
+        });
     }
 
     /**

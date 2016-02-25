@@ -8,6 +8,7 @@ const debug = require('debug')('auth');
 const promisify = require("promisify-node");
 const bcrypt = promisify(require('bcrypt-nodejs'));
 const parse = require('co-body');
+const util = require('util');
 
 router.post('/login', async (ctx, next) => {
 
@@ -22,17 +23,18 @@ router.post('/login', async (ctx, next) => {
     if (user) {
         const isPasswordCorrect = await bcrypt.compare(data.password, user.password);
         if (isPasswordCorrect) {
-            ctx.status = 200;
-            return ctx.body = "the token";
+            ctx.state.login = data.login;
+            return next();
         }
 
         ctx.status = 403;
         ctx.body = 'Incorrect password';
-        return;
+        return next();
     }
 
     ctx.status = 404;
     ctx.body = 'User not found';
+    return next();
 });
 
 app.use(router.routes());
