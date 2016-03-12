@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) =>
       },
     },
   }, {
-    associate: ({ Folder, Company, Media }) => {
+    associate: ({ Folder, Company, Media, User }) => {
       Folder.belongsTo(Company);
       Folder.hasMany(Folder, {
         onDelete: 'cascade',
@@ -17,5 +17,6 @@ module.exports = (sequelize, DataTypes) =>
       });
       Folder.belongsTo(Folder, { as: 'parent', foreignKey: 'parentId' });
       Folder.hasMany(Media, { onDelete: 'cascade' });
+      Folder.belongsToMany(User, {through: 'Permissions'});
     },
   });

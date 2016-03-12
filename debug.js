@@ -57,7 +57,11 @@ module.exports = new Promise (function(resolved, rejected){
       yield company.addFolder(library2);
       yield company.addFolder(library3);
       yield company.addUser(user);
-      yield company.addUser(user2);
+     // yield company.addUser(user2);
+
+      yield library1.addUser(user);
+
+      //<library>.getUsers()
 
       yield company.addUser(user3);
       const folder1 = yield db.Folder.create({ name: 'Folder1' });
