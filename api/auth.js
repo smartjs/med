@@ -9,10 +9,16 @@ const promisify = require("promisify-node");
 const bcrypt = promisify(require('bcrypt-nodejs'));
 const parse = require('co-body');
 const util = require('util');
+const jwt = require('jsonwebtoken');
+const config = require('./../config')
 
-router.post('/login', async (ctx, next) => {
+router.post('/login', async (ctx) => {
 
-    let data = await parse.form(ctx.req);
+    try{
+        var data = await parse.form(ctx.req);
+    } catch (e){
+        throw e;
+    }
 
     try{
         var user = await User.findOne({where: {login: data.login}});
@@ -23,18 +29,19 @@ router.post('/login', async (ctx, next) => {
     if (user) {
         const isPasswordCorrect = await bcrypt.compare(data.password, user.password);
         if (isPasswordCorrect) {
-            ctx.state.login = data.login;
-            return next();
+            ctx.body = jwt.sign({id:user.id}, config.secretKey);
+            ctx.status = 200;
+            return// next();
         }
 
         ctx.status = 403;
         ctx.body = 'Incorrect password';
-        return next();
+        return// next();
     }
 
     ctx.status = 404;
     ctx.body = 'User not found';
-    return next();
+    //return next();
 });
 
 app.use(router.routes());
