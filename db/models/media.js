@@ -22,6 +22,11 @@ module.exports = (sequelize, DataTypes) =>
       type: DataTypes.INTEGER,
       defaultValue: 0,
     },
+    dislike: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    },
+    fakeId: DataTypes.STRING,
     description: DataTypes.TEXT,
     links: DataTypes.TEXT,
     file: DataTypes.STRING,

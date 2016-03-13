@@ -73,6 +73,7 @@ module.exports = co(function* makeDebug() {
     description: 'Example Media1',
     links: 'fooo',
     file: '/tmp/thai.mp4',
+    convertedFile: '/tmp/thai.mp4',
     type: 'video',
   });
 

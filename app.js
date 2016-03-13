@@ -1,18 +1,18 @@
 const debug = require('./debug');
 const Koa = require('koa');
-const app = new Koa();
-const router = new (require('koa-router'))();
-const convert = require('koa-convert');
-const jwt = require('koa-jwt');
 const mount = require('./mount');
-const auth = require('./api/auth.js');
+const convert = require('koa-convert');
+const config = require('./config');
+const api = require('./api');
+const errorHandler = require('./middlewares/errorHandler');
 
-app.use(mount('/auth', auth));
-app.use(convert(function *(next){
-  const start = new Date;
-  yield next;
-  const ms = new Date - start;
-  console.log(`${this.method} ${this.url} - ${ms}ms`);
-}));
+const koaJwt = require('koa-jwt');
 
-app.listen(3000);
+const app = new Koa();
+app.use(errorHandler);
+app.use(mount('/auth', api.auth));
+let jwtMiddleware = convert(koaJwt({ secret: config.secret }));
+app.use(jwtMiddleware);
+app.use(mount('/media', api.media));
+
+module.exports = app;
