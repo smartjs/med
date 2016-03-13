@@ -1,0 +1,7 @@
+{
+    "extends": "airbnb/base",
+    "ecmaFeatures": {
+      "generators": true,
+      "objectLiteralShorthandMethods": true
+    }
+}
