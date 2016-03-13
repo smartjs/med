@@ -29,7 +29,7 @@ router.post('/login', async (ctx) => {
     if (user) {
         const isPasswordCorrect = await bcrypt.compare(data.password, user.password);
         if (isPasswordCorrect) {
-            ctx.body = jwt.sign({id:user.id}, config.secretKey);
+            ctx.body = jwt.sign({id:user.id, companyId:user.companyId}, config.secretKey);
             ctx.status = 200;
             return// next();
         }

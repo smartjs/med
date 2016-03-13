@@ -3,6 +3,7 @@ const debug = require('./debug');
 const mount = require('./mount');
 const route = require('koa-route');
 const authHandler = require('./api/auth');
+const folderPermissionsHandler = require('./api/folderPermissions');
 const config = require('./config');
 const koaJwt = require('koa-jwt');
 const Folder = require('./db').Folder;
@@ -28,43 +29,27 @@ async function main(){
 
     app.use(mount('/auth', authHandler));
     app.use(convert(koaJwt({secret: config.secretKey/*,  passthrough: true*/})));
+    app.use(mount('/folder', folderPermissionsHandler));
 
     app.use(route.get('/folder/:id/permissions', async (ctx, folderId, next) => {
 
-        const folder = await getFolderIfExist(ctx, folderId);
+        const folder = await getFolderIfExistAndBelongToUserCompany(ctx, folderId);
 
         if (!folder){
-            ctx.status = 404;
-            ctx.body = 'Folder not found';
-            return //next();
-        }
-
-        const checkPassed = await checkIfUserAndFolderBelongToSameCompany(ctx, folder);
-        if (!checkPassed){
-            return;
+            return ctx.status = 404;
         }
 
         const users = await folder.getUsers();
         ctx.body = users.map(user => user.id);
         ctx.status = 200;
-
-        return next();
     }));
 
     app.use(route.post('/folder/:id/permissions',  async (ctx, folderId, next) => {
 
-        ctx.status = 200;
-        const folder = await getFolderIfExist(ctx, folderId);
+        const folder = await getFolderIfExistAndBelongToUserCompany(ctx, folderId);
 
         if (!folder){
-            ctx.status = 404;
-            ctx.body = 'Folder not found';
-            return;
-        }
-
-        const checkPassed = await checkIfUserAndFolderBelongToSameCompany(ctx, folder);
-        if (!checkPassed){
-            return;
+            return ctx.status = 404;
         }
 
         try {
@@ -73,64 +58,38 @@ async function main(){
            logger.error(err);
         }
 
-
         if (!Array.isArray(data)) {
-            ctx.status = 400;
-            ctx.body = "Data must be an array";
-            return// next();
+            return ctx.status = 400;
         }
 
         for (item of data){
             if (typeof item !== 'number') {
-                ctx.status = 400;
-                ctx.body = "Only numbers allowed in array";
-                return// next();
-            }
-
-            const user = await User.findOne({where: {id: item}});
-
-            if (!user) {
-                ctx.status = 404;
-                ctx.body = 'Wrong userId';
-                return// next();
+                return ctx.status = 400;
             }
         }
 
-        if (ctx.status === 200){
-            folder.setUsers(data);
+        const result = await User.findAndCountAll({where: {id: data}});
+        if (result.count !== data.length) {
+            return ctx.status = 404;
         }
+
+        folder.setUsers(data);
+        ctx.status = 200;
     }));
 
-    async function checkIfUserAndFolderBelongToSameCompany(ctx, folder) {
-        try{
-            var user = await User.findOne({where: {id: ctx.state.user.id}});
-        } catch (err){
-            throw new Error(`User not found: ${err}`);
+    async function getUser(ctx, userId){
+        const user = await User.findOne({where: {id: ctx.state.user.id}});
+        if (user.type === 'mobile'){
+            return ctx.status = 403;
         }
-
-        if (!user){
-            ctx.status = 404;
-            ctx.body = 'User not found';
-            return false;
-        }
-
-        if (user.CompanyId !== folder.CompanyId){
-            ctx.status = 403;
-            ctx.body = 'Folder belongs another company';
-            return false;
-        }
-
-        return true;
     }
 
-    async function getFolderIfExist(ctx, folderId){
+    async function getFolderIfExistAndBelongToUserCompany(ctx, folderId){
         try{
-            var folder = await Folder.findOne({where: {id: folderId}});
+            var folder = await Folder.findOne({where: {id: folderId, companyId: ctx.state.user.companyId}});
         }catch (err){
             logger.error(`Error while getting folder with id ${folderId}: ${err}`);
         }
-
-        ctx.state.folder = folder;
         return folder;
     }
 
