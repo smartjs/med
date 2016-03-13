@@ -7,8 +7,8 @@ const debug = require('./../debug');
 const should = require('chai').should();
 const util = require('util')
 
-const adminToken = jwt.sign({id: 1}, config.secretKey);
-const mobileToken = jwt.sign({id: 3}, config.secretKey);
+const adminToken = jwt.sign({id: 1, companyId:1}, config.secretKey);
+const mobileToken = jwt.sign({id: 3, companyId:1}, config.secretKey);
 
 
 var server;
@@ -24,8 +24,8 @@ describe('Testing permissions', function(){
         })
     })
 
-    describe('as admin', testsByUser.bind(null, adminToken, true));
-    //describe('as mobile', testsByUser.bind(null, mobileToken, false));
+    //describe('as admin', testsByUser.bind(null, adminToken, true));
+    describe('as mobile', testsByUser.bind(null, mobileToken, false));
 })
 
 
@@ -46,24 +46,22 @@ function testsByUser(token, isPermitted){
 
         describe("GET with invalid token", function(){
             it("Should return " + code, function(done){
-                code = (isPermitted) ? 401 : 403;
                 server
                     .get('/folder/1/permissions')
                     .set('Authorization', 'Bearer ' + 'invalid_token_bla-bla')
-                    .expect(code, done);
+                    .expect(401, done);
             });
         });
 
 
         describe("POST with invalid token", function(){
             it("Should return " + code, function(done){
-                code = isPermitted ? 401 : 403;
                 server
                     .post('/folder/1/permissions')
                     .set('Authorization', 'Bearer ' + 'invalid_token_bla-bla')
                     .type('form')
                     .send([1,2])
-                    .expect(code, done);
+                    .expect(401, done);
             });
         });
 
@@ -166,7 +164,7 @@ function testsByUser(token, isPermitted){
 
         describe("GET by user from other company", function(){
             it('Should return ' + code, function(done){
-                code = isPermitted ? 403 : 403;
+                code = isPermitted ? 404 : 403;
                 server
                     .get('/folder/1/permissions')
                     .set('Authorization', 'Bearer ' + token2)
