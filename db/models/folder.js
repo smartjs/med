@@ -15,6 +15,13 @@ module.exports = (sequelize, DataTypes) =>
         foreignKey: 'parentId',
         useJunctionTable: false,
       });
+      Folder.hasMany(Folder, {
+        onDelete: 'cascade',
+        as: 'descendants',
+        foreignKey: 'rootId',
+        useJunctionTable: false,
+      });
+      Folder.belongsTo(Folder, { as: 'root', foreignKey: 'rootId' });
       Folder.belongsTo(Folder, { as: 'parent', foreignKey: 'parentId' });
       Folder.hasMany(Media, { onDelete: 'cascade' });
     },
