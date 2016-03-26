@@ -1,6 +1,6 @@
 require('./helpers/mochawait');
-var request = require('supertest');
-var expect = require('chai').expect;
+const request = require('supertest');
+const expect = require('chai').expect;
 request = request('http://medserver.apps.wookieelabs.com/api');
 
 const promisify = req =>
